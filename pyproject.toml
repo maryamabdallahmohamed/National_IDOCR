@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "national-idocr"
+version = "0.1.0"
+description = "Egyptian national ID OCR and extraction pipeline"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.141.1",
+    "imutils>=0.5.4",
+    "matplotlib>=3.11.2",
+    "numpy>=2.0",
+    "opencv-python>=4.10",
+    "paddleocr>=2.9.0",
+    "torch>=2.14.0",
+    "transformers>=5.17.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.8",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+exclude = [
+    "IDOCR.ipynb",
+    "src/ImageProcessing.py",
+    "src/RegionDetection.py",
+    "src/models.py",
+    "src/routes.py",
+    "src/ocr/PaddaleOCRExtractor.py",
+    ".venv",
+    "__pycache__",
+]
+
+[tool.setuptools]
+py-modules = []

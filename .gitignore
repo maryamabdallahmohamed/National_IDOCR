@@ -1,0 +1,8 @@
+.DS_Store
+notebook.ipynb
+*.jpeg
+*.pyc
+__pycache__
+.venv
+national_idocr.egg-info
+.vscode
