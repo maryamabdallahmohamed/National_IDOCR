@@ -3,15 +3,20 @@ from backend.app.core.preprocessing import CardDetector,CardPerspective,ProcessC
 from backend.app.core.ocr import PaddleOCRWrapper
 from backend.app.core.extractor import extract_region_text, convert_arabic_to_english
 from backend.app.core.models import IDCardData
-def extract_id_card(image_bytes):
+from backend.app.core.worker import IDCardWorker
 
-    # Initialize components
-    ingestion = CardIngest()
-    preprocessor = CardPreprocess()
-    detector = CardDetector()
-    perspective = CardPerspective()
-    processor = ProcessCard()
-    ocr = PaddleOCRWrapper()
+
+def extract_id_card(image_bytes, worker=None):
+
+    if worker is None:
+        worker = IDCardWorker()
+
+    ingestion = worker.ingestion
+    preprocessor = worker.preprocessor
+    detector = worker.detector
+    perspective = worker.perspective
+    processor = worker.processor
+    ocr = worker.ocr
 
     # 1. Load image
     image = ingestion.process_image(image_bytes)
@@ -21,7 +26,7 @@ def extract_id_card(image_bytes):
 
     blurred = preprocessor.intensify_black(
         blurred,
-        threshold=190,
+        threshold=180,
         strength=2
     )
 

@@ -1,9 +1,19 @@
-from fastapi import FastAPI, File,UploadFile
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, File, UploadFile, Request
 from main import extract_id_card
+from backend.app.core.worker import IDCardWorker
 import base64
 import cv2
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.id_card_worker = IDCardWorker()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/")
@@ -14,9 +24,9 @@ def read_root():
 
 
 @app.post("/CardProcessings")
-async def process_card(file: UploadFile = File(...)):
+async def process_card(request: Request, file: UploadFile = File(...)):
     contents = await file.read()
-    id_card_data = extract_id_card(contents)
+    id_card_data = extract_id_card(contents, request.app.state.id_card_worker)
 
     encoded_photo = cv2.imencode(".jpg", id_card_data.photo)[1].tobytes()
 
