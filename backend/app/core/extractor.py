@@ -1,7 +1,9 @@
 
 
 import cv2
+from backend.app.core.logging import get_logger
 
+logger= get_logger("Extractor Pipeline")
 
 def extract_region_text(region, preprocessor, ocr):
     enhanced_region, binary_region = preprocessor.enhance_text(region)

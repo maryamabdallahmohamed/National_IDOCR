@@ -1,7 +1,9 @@
 import cv2
 import imutils
 import numpy as np
+from backend.app.core.logging import get_logger
 
+logger= get_logger("Ingestion Pipeline")
 
 class CardIngest:
     
@@ -15,6 +17,8 @@ class CardIngest:
             raise ValueError("Invalid image")
 
         image = imutils.resize(image,width=800)
+
+        logger.info(f"Processed image with shape of {image.shape}")
 
         return image
 
@@ -69,6 +73,8 @@ class CardPreprocess:
             cv2.THRESH_BINARY + cv2.THRESH_OTSU
         )
 
+        logger.info(f"Enhanced text region with shape of {sharpened.shape}")
+
         return sharpened, binary
 
     def find_contours(self, image):
@@ -92,6 +98,8 @@ class CardPreprocess:
                         (threshold - gray_float) / threshold),
             gray_float
         )
+
+        logger.info(f"Intensified black regions in image with shape of {enhanced.shape}")
 
         return np.clip(enhanced, 0, 255).astype(np.uint8)
 

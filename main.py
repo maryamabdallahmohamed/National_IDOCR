@@ -69,6 +69,11 @@ def extract_id_card(image_bytes):
     name = " ".join(filter(None, [name_1, name_2]))
     id_number = "".join(filter(None, [id_1, id_2]))
     id_number_english= convert_arabic_to_english(id_number)
+    if len(id_number_english) != 14 or not id_number_english.isdigit():
+        raise ValueError(
+            f"Invalid Egyptian national ID OCR result: expected 14 digits, got {id_number_english!r}"
+        )
+
     if id_number_english[0] == '2':
         year = '19' + id_number_english[1:3]
     else:

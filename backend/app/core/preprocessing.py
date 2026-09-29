@@ -1,6 +1,8 @@
 import numpy as np
 import cv2
+from backend.app.core.logging import get_logger
 
+logger= get_logger("Preprocessing Pipeline")
 class CardPerspective:
 
     def order_points(self, points):
@@ -17,7 +19,7 @@ class CardPerspective:
 
         ordered[1] = points[np.argmin(diff)]  # top-right
         ordered[3] = points[np.argmax(diff)]  # bottom-left
-
+        logger.info(f"Ordered points for perspective transform: {ordered}")
         return ordered
 
     def four_point_transform(self, image, pts):
@@ -53,7 +55,7 @@ class ProcessCard:
         id_number_region2 = ordered_image_points[ 270:350 , 368:580]
         photo_region = ordered_image_points[ 20:220,30:140]
         factory_number_region = ordered_image_points[ 330:360,20:220]
-
+        logger.info(f"Extracted card fields with shapes: name_region_1: {name_region_1.shape}, name_region_2: {name_region_2.shape}, address_region: {address_region.shape}, id_number_region1: {id_number_region1.shape}, id_number_region2: {id_number_region2.shape}, photo_region: {photo_region.shape}, factory_number_region: {factory_number_region.shape}")
         return name_region_1, name_region_2, address_region, id_number_region1,id_number_region2, photo_region, factory_number_region
 
 class CardDetector:
@@ -85,5 +87,5 @@ class CardDetector:
 
         # Largest quadrilateral
         candidates.sort(key=lambda x: x[0],reverse=True )
-
+        logger.info(f"Found card contour with area: {candidates[0][0]} and points: {candidates[0][1]}")
         return candidates[0][1]
