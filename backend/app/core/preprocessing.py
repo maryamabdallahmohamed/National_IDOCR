@@ -49,10 +49,10 @@ class CardPerspective:
 class ProcessCard:
     def get_fields(self, ordered_image_points):
         name_region_1 = ordered_image_points[ 80:138,250:580]
-        name_region_2 = ordered_image_points[ 125:165,250:580]
+        name_region_2 = ordered_image_points[ 120:165,250:580]
         address_region = ordered_image_points[170:250, 320:580 ]
         id_number_region1 = ordered_image_points[ 270:350 , 240:370]
-        id_number_region2 = ordered_image_points[ 270:350 , 368:580]
+        id_number_region2 = ordered_image_points[ 260:350 , 368:580]
         photo_region = ordered_image_points[ 20:220,30:140]
         factory_number_region = ordered_image_points[ 330:360,20:220]
         logger.info(f"Extracted card fields with shapes: name_region_1: {name_region_1.shape}, name_region_2: {name_region_2.shape}, address_region: {address_region.shape}, id_number_region1: {id_number_region1.shape}, id_number_region2: {id_number_region2.shape}, photo_region: {photo_region.shape}, factory_number_region: {factory_number_region.shape}")
