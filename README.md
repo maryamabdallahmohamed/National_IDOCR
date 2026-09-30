@@ -4,6 +4,22 @@ A Python-based OCR pipeline for extracting structured data from Egyptian nationa
 
 This repository currently focuses on the backend OCR API, which exposes a FastAPI endpoint for processing uploaded card images.
 
+## Demo
+
+Example input and output views from the OCR workflow:
+
+### ID Card Input
+
+![Example Egyptian national ID card](ID_Card_Demo.png)
+
+### Extraction Result
+
+![Structured extraction result](Extraction.png)
+
+### Application Demo
+
+![National ID OCR application demo](Demo.png)
+
 ## Overview
 
 The application performs the following steps:
