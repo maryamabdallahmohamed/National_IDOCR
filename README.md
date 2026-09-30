@@ -91,13 +91,13 @@ From the project root:
 
 ```bash
 cd National_IDOCR
-uv run uvicorn backend.api.routes:app --host 0.0.0.0 --port 8000
+uv run uvicorn backend.api.routes:app --host 0.0.0.0 --port 8000 --reload --reload-dir backend
 ```
 
 Or, if your environment is already activated:
 
 ```bash
-python -m uvicorn backend.api.routes:app --host 0.0.0.0 --port 8000
+python -m uvicorn backend.api.routes:app --host 0.0.0.0 --port 8000 --reload --reload-dir backend
 ```
 
 Once started, the API will be available at:
