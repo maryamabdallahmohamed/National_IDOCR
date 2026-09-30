@@ -33,6 +33,6 @@ COPY  README.md ./README.md
 
 RUN uv sync --frozen
 
-EXPOSE 8000
+EXPOSE 7860
 
-CMD ["uv", "run", "--frozen", "uvicorn", "backend.api.routes:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uv run --frozen uvicorn backend.api.routes:app --host 0.0.0.0 --port ${PORT:-7860}"]

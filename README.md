@@ -1,3 +1,14 @@
+---
+title: Egyptian National ID OCR API
+emoji: 🪪
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+suggested_hardware: cpu-basic
+short_description: FastAPI OCR demo for synthetic Egyptian national ID images.
+---
+
 # National ID OCR
 
 A Python-based OCR pipeline for extracting structured data from Egyptian national ID cards. The project combines image preprocessing, contour detection, perspective correction, and OCR to detect identifying fields such as the holder name, address, national ID number, gender, and birth date.
@@ -48,7 +59,7 @@ The application performs the following steps:
 - PaddleOCR
 - OpenCV (`cv2`)
 - NumPy
-- Streamlit (present in dependencies but not the primary runtime path in this repo)
+- Streamlit frontend
 
 ## Project Structure
 
@@ -66,7 +77,8 @@ National_IDOCR/
 │           ├── models.py     # Data models
 │           └── worker.py     # Reusable processing worker
 ├── frontend/
-│   └── app.py                # Frontend placeholder / scaffold
+│   ├── app.py                # Streamlit frontend
+│   └── requirements.txt      # Streamlit Cloud dependencies
 ├── main.py                    # Entry extraction function used by the API
 ├── Dockerfile                 # Container configuration
 ├── pyproject.toml             # Python dependencies and project metadata
@@ -178,10 +190,118 @@ docker build -t national-idocr .
 Run the container:
 
 ```bash
-docker run -p 8000:8000 national-idocr
+docker run -p 7860:7860 national-idocr
 ```
 
-The container starts the API on port `8000` and exposes the same FastAPI endpoint described above.
+The container starts the API on port `7860` by default, which is required by
+Hugging Face Spaces. To run the container locally on port `8000`, use:
+
+```bash
+docker run -e PORT=8000 -p 8000:8000 national-idocr
+```
+
+Both configurations expose the same FastAPI endpoint described above.
+
+## Public Demo Deployment
+
+The frontend and backend are deployed as separate services:
+
+```text
+User -> Streamlit Community Cloud -> HTTPS -> Render FastAPI service
+```
+
+### Hugging Face Spaces deployment
+
+This repository can also run as a free CPU Docker Space. Create a new Space
+with **Docker** as the SDK, then upload or push this repository. The metadata
+above configures the Space to expose port `7860`. The container starts the
+FastAPI application at `backend.api.routes:app`.
+
+After the Space builds, use its URL as the Streamlit backend URL:
+
+```toml
+BACKEND_URL = "https://<space-owner>-<space-name>.hf.space"
+```
+
+Verify the Space before configuring Streamlit:
+
+```bash
+curl https://<space-owner>-<space-name>.hf.space/
+open https://<space-owner>-<space-name>.hf.space/docs
+```
+
+The first request can be slow while PaddleOCR downloads its models. The free
+CPU Space may sleep when idle, and model files can be downloaded again after a
+restart. Upload only synthetic/test images.
+
+The backend application is `backend.api.routes:app`, and the OCR endpoint is
+`POST /CardProcessings`. PaddleOCR is configured for CPU inference by default;
+the application does not use `torch` or CUDA directly.
+
+### Deploy the backend on Render
+
+Create a **Web Service** from this repository with:
+
+- Build command: `pip install -r requirements.txt`
+- Start command: `uvicorn backend.api.routes:app --host 0.0.0.0 --port $PORT`
+- Health check path: `/`
+- Python version: `3.13.0` (also declared in `render.yaml`)
+
+Render can use the included `render.yaml` to prefill these settings. After the
+service deploys, verify `https://<backend-url>/docs` and
+`https://<backend-url>/`. Test the OCR route with:
+
+```bash
+curl -X POST "https://<backend-url>/CardProcessings" \
+  -F "file=@/path/to/synthetic_id_card.jpg"
+```
+
+The first request may be slow because PaddleOCR downloads and initializes its
+models. The free Render service may also sleep when idle. Model files are
+stored in the service filesystem and may need to be downloaded again after a
+restart; no persistent disk is required for this demo.
+
+### Deploy the frontend on Streamlit Community Cloud
+
+1. Create a new app from this repository.
+2. Set the main file to `frontend/app.py`.
+3. In the app settings, add the secret:
+
+```toml
+BACKEND_URL = "https://<backend-url>"
+```
+
+Streamlit exposes this secret as the `BACKEND_URL` environment variable used
+by the app. Do not commit the deployment URL or secrets to source code.
+
+### Local development
+
+From the repository root, use two terminals:
+
+```bash
+# Terminal 1: FastAPI
+uv run uvicorn backend.api.routes:app --host 0.0.0.0 --port 8000 --reload --reload-dir backend
+```
+
+```bash
+# Terminal 2: Streamlit
+BACKEND_URL=http://localhost:8000 uv run streamlit run frontend/app.py
+```
+
+The Streamlit process sends the uploaded file from the server to
+`http://localhost:8000/CardProcessings`. In production, set `BACKEND_URL` to
+the public HTTPS Render URL instead.
+
+### Deployment checklist
+
+- [ ] Push `render.yaml`, `requirements.txt`, and the frontend changes.
+- [ ] Confirm Render uses `backend.api.routes:app` and `$PORT`.
+- [ ] Confirm Render `/docs` and `/` are reachable.
+- [ ] Test `/CardProcessings` with a synthetic image using `curl`.
+- [ ] Deploy `frontend/app.py` on Streamlit Community Cloud.
+- [ ] Add the `BACKEND_URL` Streamlit secret with the Render HTTPS URL.
+- [ ] Upload only synthetic/test images and verify the complete request.
+- [ ] Do not put real national IDs or personal documents into the demo.
 
 ## How the Extraction Pipeline Works
 

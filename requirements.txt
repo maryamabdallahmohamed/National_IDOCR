@@ -1,0 +1,9 @@
+fastapi[standard]>=0.141.1,<1
+imutils>=0.5.4
+numpy>=2.5.3
+opencv-python-headless>=4.10.0
+paddleocr==3.3.3
+paddlepaddle==3.2.2
+Pillow>=10.0.0
+requests>=2.32.0
+streamlit>=1.64.0
