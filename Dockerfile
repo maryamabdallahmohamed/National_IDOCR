@@ -31,7 +31,7 @@ COPY  frontend ./frontend
 COPY  README.md ./README.md
 
 
-RUN uv sync --frozen
+RUN uv sync 
 
 EXPOSE 7860
 
