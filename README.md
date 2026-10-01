@@ -27,9 +27,6 @@ Example input and output views from the OCR workflow:
 
 ![Structured extraction result](Extraction.png)
 
-### Application Demo
-
-![National ID OCR application demo](Demo.png)
 
 ## Overview
 
